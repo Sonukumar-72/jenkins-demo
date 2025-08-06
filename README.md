@@ -1,162 +1,99 @@
-# Jenkins CI/CD Pipeline with Docker and GitHub
+# 🚀 Jenkins CI/CD Pipeline with Docker and GitHub
 
-This repository demonstrates a Jenkins pipeline implementation for achieving continuous integration and continuous deployment (CI/CD) using Docker and GitHub.
+This project demonstrates a complete CI/CD pipeline using **Jenkins**, **Docker**, and **GitHub**, running on an **Amazon EC2 Linux instance**.
 
-## Introduction
+---
 
-The CI/CD pipeline provided here allows you to automate the process of building, testing, and deploying your application whenever changes are pushed to the GitHub repository. Jenkins, an open-source automation server, is used as the orchestrator for the pipeline. Docker, a popular containerization platform, is utilized to manage the deployment process.
+## 📌 Table of Contents
 
-## Prerequisites
+- [Introduction](#introduction)
+- [Project Objectives](#project-objectives)
+- [Prerequisites](#prerequisites)
+- [Pipeline Architecture](#pipeline-architecture)
+- [Task 1: Static Website in Docker](#task-1-static-website-in-docker)
+- [Task 2: Jenkins CI/CD Pipeline](#task-2-jenkins-cicd-pipeline)
+- [Setup Guide](#setup-guide)
+- [Jenkins Pipeline Code](#jenkins-pipeline-code)
+- [Result Screenshots](#result-screenshots)
 
-Before setting up the pipeline, ensure that you have the following prerequisites:
+---
 
-1. An Amazon EC2 Linux machine with Jenkins, Git, and Docker installed.
-2. A GitHub repository containing your application code and Dockerfile.
+## 🧾 Introduction
 
-## Project Pipeline Flowchart
+This CI/CD pipeline automates the process of building and deploying a static website using Jenkins and Docker. It ensures that any changes pushed to GitHub are automatically deployed to a Docker container running on an EC2 instance.
 
-The CI/CD pipeline workflow is represented as follows:
+---
 
-![Jenkins CI_CD Pipeline with Docker and GitHub](https://github.com/harshartz/Jenkins-CI-CD-Pipeline-with-Docker-and-GitHub/assets/130890384/ab868d34-cfc4-4079-95b8-0b584622add5)
+## 🎯 Project Objectives
 
+| Task | Description |
+|------|-------------|
+| ✅ Task 1 | Create a basic Dockerized static website |
+| ✅ Task 2 | Set up a Jenkins pipeline to automate build and deployment using GitHub commits |
 
-## Installation Instructions
+---
 
-### Installing Jenkins
+## ⚙️ Prerequisites
 
-To install Jenkins, follow these steps:
+- EC2 Amazon Linux instance
+- Jenkins installed and running
+- Docker installed and running
+- Git installed
+- GitHub repository with:
+  - `index.html`
+  - `Dockerfile`
+  - `Jenkinsfile` (optional)
+- Jenkins configured with GitHub Webhook and credentials
 
-1. Ensure that your software packages are up to date on your instance by using the following command to perform a quick software update:
-    ```bash
-    sudo yum update –y
-    ```
+---
 
-2. Add the Jenkins repository using the following command:
-    ```bash
-    sudo wget -O /etc/yum.repos.d/jenkins.repo \
-        https://pkg.jenkins.io/redhat-stable/jenkins.repo
-    ```
+## 📊 Pipeline Architecture
 
-3. Import a key file from Jenkins-CI to enable installation from the package:
-    ```bash
-    sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
-    ```
+![Jenkins CI/CD Pipeline](https://github.com/harshartz/Jenkins-CI-CD-Pipeline-with-Docker-and-GitHub/assets/130890384/ab868d34-cfc4-4079-95b8-0b584622add5)
 
-4. Upgrade the system packages:
-    ```bash
-    sudo yum upgrade
-    ```
+---
 
-5. Install Java (Amazon Linux 2):
-    ```bash
-    sudo amazon-linux-extras install java-openjdk11 -y
-    ```
+## 🧪 Task 1: Static Website in Docker
 
-   Install Java (Amazon Linux 2023):
-    ```bash
-    sudo dnf install java-11-amazon-corretto -y
-    ```
+- Created a simple HTML website.
+- Dockerized using NGINX and built with `Dockerfile`.
+- Exposed via port 8080 on the host.
+- Successfully accessed using: `http://localhost:8080/index.html`
 
-6. Install Jenkins:
-    ```bash
-    sudo yum install jenkins -y
-    ```
+### ✅ Proof:
 
-7. Enable the Jenkins service to start at boot:
-    ```bash
-    sudo systemctl enable jenkins
-    ```
+![Website Running](./assest/website%20running.png)
+![Docker Build](./assest/docker.png)
 
-8. Start Jenkins as a service:
-    ```bash
-    sudo systemctl start jenkins
-    ```
+---
 
-9. You can check the status of the Jenkins service using the command:
-    ```bash
-    sudo systemctl status jenkins
-    ```
-### Installing Docker
+## 🔁 Task 2: Jenkins CI/CD Pipeline
 
-To install Docker, follow these steps:
+- Configured a **Freestyle Project** in Jenkins.
+- Connected GitHub repo via webhook.
+- On each push, Jenkins:
+  - Checks if a container is running.
+  - If running, it copies the updated files into it.
+  - Else, it builds a Docker image and starts a new container.
 
-1. Install Docker:
-    ```bash
-    sudo yum install docker -y
-    ```
+### ✅ Jenkins Build Success:
+![ssh ](./assest/ssh%20into%20ec2.png)
+![Jenkins Build](./assest/jenkins.png)
+![Jenkins Build Success](./assest/jenkinsconsoloutput.png)
 
-2. Enable Docker to start on system boot:
-    ```bash
-    sudo systemctl enable docker
-    ```
+---
 
-3. Start the Docker service:
-    ```bash
-    sudo systemctl start docker
-    ```
+## 📥 Setup Guide
 
-### Installing Git
-
-To install Git, follow these steps:
-
-1. Install Git:
-    ```bash
-    sudo yum install git -y
-    ```
-
-### Additional Configuration
-
-To allow Jenkins to interact with Docker, execute the following command:
+### 🔧 Install Jenkins
 
 ```bash
-sudo usermod -aG docker jenkins
-```
-After executing the above command, restart Jenkins:
-
-```bash
-sudo systemctl restart jenkins
-```
-
-## Pipeline Overview
-
-The Jenkins pipeline is triggered by a webhook configured on the GitHub repository. Whenever a developer pushes changes to the repository, the pipeline is initiated, and the following steps are executed:
-
-1. The pipeline checks if there is a running Docker container for the application.
-2. If a container is running, the pipeline copies the updated files from the Jenkins workspace to the running container, ensuring the changes are immediately reflected.
-3. If no running container is found, the pipeline builds a new Docker image using the code from the GitHub repository and deploys it as a new container on the Amazon EC2 Linux machine.
-4. The deployed application can then be accessed on the target machine through the specified port.
-
-## Getting Started
-
-To get started with this CI/CD pipeline, follow the steps below:
-
-1. Set up Jenkins, Git, and Docker on your machine.
-2. Provide Jenkins with a GitHub credential (token):
-   - Generate a GitHub personal access token with the appropriate scopes (repo, webhook, etc.).
-   - In Jenkins, go to "Manage Jenkins" > "Manage Credentials"> "Global credentials (unrestricted)".
-   - Add a new credential of type "Secret text" or "Secret file" and enter your GitHub token.
-   - Save the credential. 
-3. Configure Jenkins by accessing its web interface.
-4. Create a new Jenkins job and configure it as follows:
-   - Set the job type to "Freestyle Project".
-   - Connect it to your GitHub repository (https://github.com/harshartz/Jenkins-project.git) and configure the webhook.
-   - Select "GitHub hook trigger for GITScm polling" as the build trigger.
-   - Add an "Execute Shell" build step to the pipeline and use the following code:
-   ```bash
-   #!/bin/bash
-
-    container_id=$(docker ps --filter "status=running" --format "{{.ID}}")
-
-    if [ -n "$container_id" ]; then
-    docker cp /var/lib/jenkins/workspace/devops-project/. "$container_id":/usr/share/nginx/html
-    else
-    docker build -t server /var/lib/jenkins/workspace/devops-project
-    docker run -d -p 9090:80 server
-    fi
-    ```
-Run the Jenkins job and verify the successful execution of the pipeline.
-
-![Screenshot (11)](https://github.com/harshartz/Jenkins-project/assets/130890384/1ffd9035-951d-4ced-89a2-84b6c5c7f6e0)
-
-*Application is running, and whenever a developer commits changes to the GitHub repository, it will automatically get deployed to the application.*
-
+sudo yum update -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo amazon-linux-extras install java-openjdk11 -y   # or for Amazon Linux 2023:
+sudo dnf install java-11-amazon-corretto -y
+sudo yum install jenkins -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
